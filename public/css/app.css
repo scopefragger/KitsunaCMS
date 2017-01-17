@@ -1,0 +1,114 @@
+
+.e3-sidebar {
+    background: RGB(228, 57, 63);
+    min-height: 100vh;
+    opacity: 0.95;
+    color: white;
+}
+
+.e3-sidebar button {
+    width: 30%;
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 55px;
+    float: right;
+    background: white;
+    border: none;
+    color: RGB(228, 57, 63);
+    font-weight: bold;
+}
+
+.e3-sidebar input {
+    border-radius: 0 !important;
+    border: none;
+    padding: 10px;
+    height: 50px;
+    font-size: 12px;
+    color: RGB(228, 57, 63);
+}
+
+.e3-hero-box .e3-hero-text {
+    color: white;
+    font-size: 100px;
+    position: absolute;
+    bottom: 30px;
+    font-weight: bold;
+    line-height: 1em;
+    left: 40px;
+}
+
+.e3-hero-box {
+    position: relative;
+    height: 100%;
+    min-height: 100vh;
+
+}
+
+.e3-hero-box-small {
+    background: url('../background-image.jpg');
+    background-size: cover;
+    width: 100%;
+}
+
+.e3-hero-box-small .e3-hero-text {
+    color: white;
+    font-size: 50px;
+}
+
+body {
+    background: url('../background-image.jpg');
+    background-size: cover;
+    width: 100%;
+}
+
+.logos {
+    max-width: 150px;
+}
+
+.e3-text {
+    margin-top: 50px;
+    color: white;
+}
+
+.e3-inner{
+    color: RGB(241, 167, 169);
+    margin-bottom: 20px;
+}
+
+hr{
+    background-color: RGB(228, 57, 63);
+    width: 100%;
+}
+
+::-webkit-input-placeholder {
+    color: RGB(242, 172, 174) !important;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+    color: RGB(242, 172, 174) !important;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+    color: RGB(242, 172, 174) !important;
+}
+
+:-ms-input-placeholder {
+    color: RGB(242, 172, 174) !important;
+}
+
+@media (max-width: 992px) {
+    .e3-sidebar {
+        margin-top: -20px;
+        margin-bottom: -50px;
+    }
+    .e3-text {
+        margin-top: 20px;
+        padding-top: 20px;
+    }
+    body{
+        background: RGB(228, 57, 63) !important;
+    }
+    .e3-hero-box-small {
+        padding-bottom: 5px;
+    }
+}
