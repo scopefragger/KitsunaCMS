@@ -4,6 +4,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Taxonomy
+ * Default Parent class for all Models
+ * @package App
+ */
 class Taxonomy extends Model
 {
     protected $fillable = ['title', 'model', 'status'];
@@ -18,7 +23,13 @@ class Taxonomy extends Model
             'rules' => 'required'
         ],
         'status' => [
-            'type' => 'string',
+            'type' => 'integer',
+            'placeholder' => 'Status',
+            'label' => 'Status',
+            'rules' => 'required'
+        ],
+        'owner' => [
+            'type' => 'integer',
             'placeholder' => 'Status',
             'label' => 'Status',
             'rules' => 'required'
@@ -38,21 +49,15 @@ class Taxonomy extends Model
 
     }
 
-
-    public function allRelations()
-    {
-
-    }
-
+    /**
+     * Taxonomy constructor.
+     * Allows classes that extend to inhert a default set of fields ( ID / Owner / Status )
+     */
     public function __construct()
     {
         $this->fields = array_merge($this->parentFields, $this->fields);
     }
 
-    public function attributes()
-    {
-        return $this->hasMany('App\Models\TaxonomyAttribute');
-    }
 
     public function rules()
     {
