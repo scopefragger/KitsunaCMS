@@ -110,13 +110,21 @@ class TaxonomyController extends Controller
     }
 
 
+    /**
+     * @version 0.1.1
+     * @return View
+     *
+     * Softdeletes a single row from `$this` models table
+     * Accessable via the route /admin/delete/{model}
+     * Expects the ID to be passed as a `$_REQUEST`
+     */
     public function delete()
     {
-        $id = Input::get('id');
+        $id = (int)Input::get('id');
         $modelname = 'App\\' . $this->name;
         $model = new $modelname;
         $clone = $model->destroy($id);
-        Cache::forget('admin_' . $this->name . '_all()');
+        $this->clearQuerys();
         return $this->index();
     }
 
@@ -135,9 +143,22 @@ class TaxonomyController extends Controller
         Cache::forget('admin_' . $this->name . '_view_new');
         Cache::forget('builder_fields');
         Cache::forget('builder_nav');
+        $this->clearQuerys();
         Cache::forget('builder_relations');
-        Cache::forget('admin_' . $this->name . '_all()');
         return $this->index();
+    }
+
+    /**
+     * @version 0.1.1
+     *
+     * Enables a small flush for only data gathered by models
+     * Not accessable via a URL action
+     * Will not clear additinal assets such as navigation cache or views
+     */
+    private function clearQuerys()
+    {
+        Cache::forget('admin_' . $this->name . '_all()');
+        Cache::forget('admin_' . $this->name . '_few()');
     }
 
     /**
@@ -172,7 +193,12 @@ class TaxonomyController extends Controller
     {
         $modelName = $this->getModelNameSpace();
         $class = new $modelName();
-        return $class::limit($this->limit)->orderBy('id', 'DESC')->get();
+        $cacheName = 'admin_' . $this->name . '_few()';
+        if (!empty(Cache::get($cacheName))) {
+            return Cache::get($cacheName);
+        } else {
+            return $data = $class::limit($this->limit)->orderBy('id', 'DESC')->get();
+        }
     }
 
     public function one($id)
