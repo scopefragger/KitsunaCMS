@@ -120,6 +120,15 @@ class TaxonomyController extends Controller
         return $this->index();
     }
 
+    /**
+     * @version 0.1.1
+     * @return View
+     *
+     * Enables a full cache flush for a single model
+     * available via $model->cache(); or by utilising the route `/admin/cache/{model}/`
+     * cache flushing includes navigation bars and all assets that relate to the model in question
+     *
+     */
     public function cache()
     {
         Cache::forget('admin_' . $this->name . '_db_build');
@@ -127,6 +136,7 @@ class TaxonomyController extends Controller
         Cache::forget('builder_fields');
         Cache::forget('builder_nav');
         Cache::forget('builder_relations');
+        Cache::forget('admin_' . $this->name . '_all()');
         return $this->index();
     }
 
