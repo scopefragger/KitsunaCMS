@@ -14,18 +14,29 @@ class Taxonomy extends Model
     protected $fillable = ['title', 'model', 'status'];
     public $nav = true;
     public $table = "taxonomies";
+    public $modules = "false";
     public $fields = [];
     public $parentFields = [
+        'id' => [
+            'type' => 'increment',
+            'placeholder' => '0',
+            'label' => 'ID',
+            'table' => 'true',
+            'hidden' => 'true',
+            'rules' => 'required'
+        ],
         'title' => [
             'type' => 'string',
             'placeholder' => 'Title',
             'label' => 'Title',
+            'table' => 'true',
             'rules' => 'required'
         ],
         'status' => [
             'type' => 'integer',
             'placeholder' => 'Status',
             'label' => 'Status',
+            'rules' => 'required',
             'rules' => 'required'
         ],
         'owner' => [
