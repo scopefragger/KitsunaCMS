@@ -93,6 +93,7 @@ class TaxonomyController extends Controller
         $model = new $modelname;
         $data = $model->find($id);
         View::share('data', $data);
+        Cache::forget('admin_' . $this->name . '_all()');
         return $this->buildTemplate('edit');
     }
 
@@ -104,6 +105,7 @@ class TaxonomyController extends Controller
         $data = $model->find($id);
         $clone = $data->replicate();
         $clone->save();
+        Cache::forget('admin_' . $this->name . '_all()');
         return $this->index();
     }
 
@@ -114,6 +116,7 @@ class TaxonomyController extends Controller
         $modelname = 'App\\' . $this->name;
         $model = new $modelname;
         $clone = $model->destroy($id);
+        Cache::forget('admin_' . $this->name . '_all()');
         return $this->index();
     }
 
@@ -138,6 +141,7 @@ class TaxonomyController extends Controller
             $model->$key = Input::get($key);
         }
         $model->save();
+        Cache::forget('admin_' . $this->name . '_all()');
         return $this->index();
 
     }
@@ -145,9 +149,14 @@ class TaxonomyController extends Controller
     public function all()
     {
         $class = $this->getModelNameSpace();
-        return $class::where('model', '=', $class)->get();
+        $cacheName = 'admin_' . $this->name . '_all()';
+        if (!empty(Cache::get($cacheName))) {
+            return Cache::get($cacheName);
+        } else {
+            $data = $class::where('model', '=', $class)->get();
+            Cache::put($cacheName, $data);
+        }
     }
-
 
     public function few()
     {
