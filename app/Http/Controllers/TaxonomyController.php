@@ -17,6 +17,7 @@ class TaxonomyController extends Controller
 
     public $name = "Taxonomy";
     public $limit = 5;
+    public $className = '';
 
 
     /**
@@ -26,6 +27,7 @@ class TaxonomyController extends Controller
     public function __construct($tax = null)
     {
         $className = "App\\" . $tax;
+        $this->className = $className;
         $class = new $className;
         $this->name = $tax;
 
@@ -289,10 +291,10 @@ class TaxonomyController extends Controller
             View::share('builder_fields', $fields);
             View::share('builder_nav', $trueController);
             View::share('builder_relations', $relations);
+            View::share('builder_model', $this->className);
 
             Cache::put('builder_fields', $fields);
             Cache::put('builder_nav', $trueController);
-            Cache::put('builder_relations', $relations);
         } else {
             $fields = Cache::get('builder_fields');
             $trueController = Cache::get('builder_nav');
@@ -301,6 +303,7 @@ class TaxonomyController extends Controller
             View::share('builder_fields', $fields);
             View::share('builder_nav', $trueController);
             View::share('builder_relations', $relations);
+            View::share('builder_model', $this->className);
         }
     }
 }
