@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 
 
@@ -30,6 +33,7 @@ class TaxonomyController extends Controller
         $this->className = $className;
         $class = new $className;
         $this->name = $tax;
+        $this->saveRoute();
 
         if (!Cache::has('admin_' . $tax . '_db_build')) {
             if (!Schema::hasTable($tax)) {
@@ -82,6 +86,24 @@ class TaxonomyController extends Controller
         return $this->buildTemplate('table');
     }
 
+    public function saveRoute()
+    {
+        if (!empty(Input::get('back')) && Input::get('back') == true) {
+            Session::put('back', URL::previous());
+        }
+    }
+
+    public function restoreRoute()
+    {
+        if (Session::has('back')) {
+            $session = Session::get('back');
+            Session::forget('back');
+            return Redirect::to($session);
+        } else {
+            return $this->index();
+        }
+
+    }
 
     public function make()
     {
@@ -109,6 +131,27 @@ class TaxonomyController extends Controller
         $clone->save();
         Cache::forget('admin_' . $this->name . '_all()');
         return $this->index();
+    }
+
+
+    public function info()
+    {
+        $modelname = 'App\\' . $this->name;
+        $model = new $modelname;
+
+        $data = [
+            ['VisibleIn Admin Nav', $model->nav],
+            ['Database Table', $model->table],
+            ['Modules Enabled', $model->modules],
+            ['Icon', $model->icon],
+        ];
+
+        View::share('data', $data);
+        View::share('fillable', $model->fillable);
+        View::share('fields', $model->fields);
+        View::share('relation', $model->relations);
+
+        return $this->buildTemplate('info');
     }
 
 
@@ -175,7 +218,7 @@ class TaxonomyController extends Controller
         }
         $model->save();
         Cache::forget('admin_' . $this->name . '_all()');
-        return $this->index();
+        return $this->restoreRoute();
 
     }
 
@@ -226,21 +269,25 @@ class TaxonomyController extends Controller
         $this->buildMainNav();
 
         if ($mode == 'table') {
-            return view('admin.table');
+            return view('admin.tax.table.index');
         } else {
             if ($mode == 'make') {
                 if (!empty(Cache::get('admin_' . $this->name . '_view_new'))) {
                     return Cache::get('admin_' . $this->name . '_view_new');
                 } else {
-                    Cache::put('admin_' . $this->name . '_view_new', view('admin.new'));
+                    Cache::put('admin_' . $this->name . '_view_new', view('admin.tax.create.index'));
                 }
-                return view('admin.new');
+                return view('admin.tax.create.index');
 
             } else {
                 if ($mode == 'edit') {
-                    return view('admin.edit');
+                    return view('admin.tax.edit.index');
                 } else {
-                    return view('admin.main');
+                    if ($mode == 'info') {
+                        return view('admin.tax.info.index');
+                    } else {
+                        return view('admin.tax.index');
+                    }
                 }
             }
         }
