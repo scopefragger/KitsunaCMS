@@ -43,9 +43,11 @@ class Link extends Taxonomy
 
     public $relations = [
         'hasMany' => [
-            'item' => 'link',
-            'local' => 'Menu',
-            'remote' => 'id'
+            [
+                'item' => 'link',
+                'local' => 'Menu',
+                'remote' => 'id'
+            ]
         ]
     ];
 
