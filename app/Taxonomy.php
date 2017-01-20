@@ -15,6 +15,7 @@ class Taxonomy extends Model
     public $nav = true;
     public $table = "taxonomies";
     public $modules = "false";
+    public $icon = "ti-pie-chart";
     public $fields = [];
     public $parentFields = [
         'id' => [
@@ -37,7 +38,6 @@ class Taxonomy extends Model
             'placeholder' => 'Status',
             'label' => 'Status',
             'rules' => 'required',
-            'rules' => 'required'
         ],
         'owner' => [
             'type' => 'integer',
