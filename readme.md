@@ -8,3 +8,4 @@ Road Map
 - [  5%] File Manager
 - [  0%] Extended User Manager
 - [  0%] YAML Database Migrations
+- [???%] Translation Flags
