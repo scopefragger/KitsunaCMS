@@ -4,12 +4,11 @@
             @if(!empty($hasMany['item']))
                 <div class="card">
                     <div class="header">
-                        <h4 class="title">Related {{ucfirst($hasMany['item'])}}'s</h4>
+                        <h4 class="title">{{trans('admin.cms_related')}} {{ucfirst($hasMany['item'])}}'s</h4>
                     </div>
                     <div class="content">
                         <form action="/admin/edit/{{$tax}}/">
                             <div class="row">
-
                                 <table class="table table-striped">
                                     <thead>
                                     @foreach($builder_fields[$hasMany['item']] as $builder)
@@ -17,7 +16,7 @@
                                             <th>{{$builder['label']}}</th>
                                         @endif
                                     @endforeach
-                                    <th>Action</th>
+                                    <th>{{trans('admin.cms_action')}}</th>
                                     </thead>
                                     <tbody>
                                     @foreach($data->getMany($hasMany['item']) as $row)
