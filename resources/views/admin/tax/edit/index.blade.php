@@ -10,7 +10,7 @@
             <div class="box-body">
                 <form action="/admin/edit/{{$tax}}/">
                     <div class="row">
-                        @include('admin._form')
+                        @include('admin.tax.partials._form')
                     </div>
                     <div class="row">
                         <div class="text-center">
@@ -22,8 +22,8 @@
             </div>
         </div>
     </div>
-    @include('admin.tax.partials._hasMany')
-    @include('admin.tax.partials._modules')
+    @include('admin.tax.edit._hasMany')
+    @include('admin.tax.edit._modules')
 @endsection
 
 
