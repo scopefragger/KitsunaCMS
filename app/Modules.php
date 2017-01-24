@@ -8,6 +8,7 @@ class Modules extends Taxonomy
 {
 
     public $table = "modules";
+    public $parent = "Navigation";
     public $nav = "false";
     public $fields = [
         'type' => [
