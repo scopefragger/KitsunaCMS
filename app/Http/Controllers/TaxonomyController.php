@@ -307,50 +307,82 @@ class TaxonomyController extends Controller
     }
 
     /**
-     * Front End
+     * Public : BuildMainNav
+     * ----------------------------------------------------
+     * Binds a number of variables to the current page
+     * Caches where possable,  Cached assets can be flushed
+     * with $this->cache(); or $this->clearQuerys();
+     * Cache persists indefenitly.
      */
-
     public function buildMainNav()
     {
 
         if (!Cache::has('builder_fields')) {
+
+            /** Some prefunction varables to be filled */
             $controllers = scandir(__DIR__ . '/../../');
             $trueController = [];
             $fields = [];
             $relations = [];
+            $tabs = ['general' => 1];
+
+            /** Step though each model in the folder */
             foreach ($controllers as $controller) {
                 if (strpos($controller, '.php') !== false) {
                     $controllerNamespace = 'App\\' . str_replace('.php', '', $controller);
                     if ($controllerNamespace != 'App\Users' && $controllerNamespace != 'App\Taxonomy') {
                         $class = new $controllerNamespace();
 
+                        /** Clean up our model files and turn them into usable names */
                         $name = str_replace('.php', '', mb_strtolower($controller));
                         $relations[$name] = $class->relations;
 
+                        /** Loop the current models fields and get the parent tags */
+                        foreach ($class->fields as $row) {
+                            if (!empty($row['parent'])) {
+                                $tabs[$name][$row['parent']] = 1;
+                            }
+                        }
+
+                        /** Detect what subnavigation the current model should be placed unders */
                         if ($class->nav == true) {
-                            $trueController[] = $name;
                             $fields[$name] = $class->fields;
+                            if ($class->parent == null) {
+                                $trueController[] = $name;
+                            } else {
+                                $trueController[$class->parent]['children'][] = $name;
+                            }
                         }
                     }
                 }
-
             }
+
+            /** provide the data as view assets */
+            View::share('builder_tabs', $tabs);
             View::share('builder_fields', $fields);
             View::share('builder_nav', $trueController);
             View::share('builder_relations', $relations);
             View::share('builder_model', $this->className);
 
+            /** Cache the fun bits */
             Cache::put('builder_fields', $fields);
+            Cache::put('builder_tabs', $tabs);
             Cache::put('builder_nav', $trueController);
+
         } else {
+
+            /** fetch the fun bits from the cache bin */
             $fields = Cache::get('builder_fields');
             $trueController = Cache::get('builder_nav');
+            $tabs = Cache::get('builder_tabs');
             $relations = Cache::get('builder_relations');
 
+            /** provide the data as view assets */
             View::share('builder_fields', $fields);
             View::share('builder_nav', $trueController);
             View::share('builder_relations', $relations);
             View::share('builder_model', $this->className);
+            View::share('builder_tabs', $tabs);
         }
     }
 }
