@@ -8,6 +8,7 @@ class Car extends Taxonomy
 {
 
     public $table = "car";
+    public $parent = "Other";
     public $fields = [
         'title' => [
             'type' => 'string',

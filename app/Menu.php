@@ -8,6 +8,7 @@ class Menu extends Taxonomy
 {
 
     public $table = "menu";
+    public $parent = "Navigation";
     public $fields = [
         'id' => [
             'type' => 'increment',

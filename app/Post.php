@@ -8,6 +8,7 @@ class Post extends Taxonomy
 {
 
     public $table = "post";
+    public $parent = "Blog";
     public $fields = [
         'id' => [
             'type' => 'increment',

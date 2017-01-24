@@ -8,6 +8,7 @@ class House extends Taxonomy
 {
 
     public $table = "house";
+    public $parent = "Other";
     public $fields = [
         'id' => [
             'type' => 'increment',

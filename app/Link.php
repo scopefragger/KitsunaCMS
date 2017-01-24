@@ -8,6 +8,7 @@ class Link extends Taxonomy
 {
 
     public $table = "link";
+    public $parent = "Navigation";
     public $fields = [
         'id' => [
             'type' => 'increment',

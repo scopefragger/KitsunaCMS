@@ -8,6 +8,7 @@ class Page extends Taxonomy
 {
 
     public $table = "page";
+    public $parent = "Blog";
     public $modules = "true";
     public $fields = [
         'title' => [

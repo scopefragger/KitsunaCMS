@@ -8,6 +8,7 @@ class Rubber extends Taxonomy
 {
 
     public $table = "rubber";
+    public $parent = "Other";
     public $fields = [
         'title' => [
             'type' => 'string',

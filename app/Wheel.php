@@ -8,6 +8,7 @@ class Wheel extends Taxonomy
 {
 
     public $table = "wheel";
+    public $parent = "Other";
     public $fields = [
         'title' => [
             'type' => 'string',

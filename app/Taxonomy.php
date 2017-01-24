@@ -11,8 +11,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Taxonomy extends Model
 {
+    /** Laravel's $fillable array  */
     protected $fillable = ['title', 'model', 'status'];
+
+    /** Defines of the Model is visible in the CMS Nav */
     public $nav = true;
+
+    /** Defines if the Model should be within a sub navigation in the CMS */
+    public $parent = null;
+
     public $table = "taxonomies";
     public $modules = "false";
     public $icon = "ti-pie-chart";
