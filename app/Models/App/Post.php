@@ -1,8 +1,7 @@
 <?php
 
-namespace App;
-
-use Illuminate\Database\Eloquent\Model;
+namespace App\Models\App;
+use App\Models\Blueprint\Taxonomy;
 
 class Post extends Taxonomy
 {

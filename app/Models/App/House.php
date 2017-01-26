@@ -1,14 +1,13 @@
 <?php
 
-namespace App;
+namespace App\Models\App;
+use App\Models\Blueprint\Taxonomy;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Link extends Taxonomy
+class House extends Taxonomy
 {
 
-    public $table = "link";
-    public $parent = "Navigation";
+    public $table = "house";
+    public $parent = "Other";
     public $fields = [
         'id' => [
             'type' => 'increment',
@@ -44,11 +43,9 @@ class Link extends Taxonomy
 
     public $relations = [
         'hasMany' => [
-            [
-                'item' => 'link',
-                'local' => 'Menu',
-                'remote' => 'id'
-            ]
+            'item' => 'link',
+            'local' => 'Menu',
+            'remote' => 'id'
         ]
     ];
 
