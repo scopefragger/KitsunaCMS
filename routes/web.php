@@ -18,4 +18,4 @@ Route::get('/', function () {
 Route::get('register', 'appController@register');
 
 Route::get('index', 'TaxonomyController@view');
-Route::get('/admin/{function}/{tax}', 'LoaderController@manager');
+Route::get('/admin/{function}/{tax}', 'Blueprint\LoaderController@manager');
