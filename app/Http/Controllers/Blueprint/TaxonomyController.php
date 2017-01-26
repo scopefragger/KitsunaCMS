@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Blueprint;
 
+use App\Http\Controllers\Controller;
 use App\Taxonomy;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
@@ -15,6 +16,13 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 
 
+/**
+ * Class TaxonomyController
+ * @package App\Http\Controllers\Blueprint
+ * ----------------------------------------
+ * Blueprint Controller for KitsuneCMS,  Used for generating core pages
+ * Core Models and the bulk of the functions for KitsunaCMS
+ */
 class TaxonomyController extends Controller
 {
 
@@ -29,50 +37,13 @@ class TaxonomyController extends Controller
      */
     public function __construct($tax = null)
     {
-        $className = "App\\" . $tax;
+        $className = "App\\Models\\App\\" . $tax;
         $this->className = $className;
         $class = new $className;
         $this->name = $tax;
         $this->saveRoute();
-
-        if (!Cache::has('admin_' . $tax . '_db_build')) {
-            if (!Schema::hasTable($tax)) {
-                Schema::create($tax, function (Blueprint $table) {
-                    $table->increments('id');
-                    $table->softDeletes();
-                    $table->rememberToken();
-                    $table->timestamps();
-                });
-            }
-
-            foreach ($class->fields as $key => $row) {
-                if (!Schema::hasColumn($tax, $key)) {
-                    Schema::table($tax, function ($table) use ($key, $row) {
-                        $type = $row['type'];
-                        $table->$type($key);
-                    });
-                }
-            }
-
-            $fieldsFlat = [];
-            foreach ($class->fields as $key => $value) {
-                $fieldsFlat[] = $key;
-            }
-
-            $columns = Schema::getColumnListing($tax);
-            foreach ($columns as $col) {
-                if (!in_array($col,
-                        $fieldsFlat) && $col != 'id' && $col != 'created_at' && $col != 'updated_at' && $col != 'deleted_at'
-                ) {
-                    if (Schema::hasColumn($tax, $col)) {
-                        Schema::table($tax, function ($table) use ($key, $row, $col) {
-                            $table->dropColumn($col);
-                        });
-                    }
-                }
-            }
-            Cache::put('admin_' . $tax . '_db_build', 1, 30);
-        }
+        $this->rebuildClassFields($class, $tax);
+        $this->rebuildTables($class, $tax);
     }
 
     /**
@@ -113,7 +84,7 @@ class TaxonomyController extends Controller
     public function edit()
     {
         $id = Input::get('id');
-        $modelname = 'App\\' . $this->name;
+        $modelname = 'App\\Models\\App\\' . $this->name;
         $model = new $modelname;
         $data = $model->find($id);
         View::share('data', $data);
@@ -124,7 +95,7 @@ class TaxonomyController extends Controller
     public function duplicate()
     {
         $id = Input::get('id');
-        $modelname = 'App\\' . $this->name;
+        $modelname = 'App\\Models\\App\\' . $this->name;
         $model = new $modelname;
         $data = $model->find($id);
         $clone = $data->replicate();
@@ -136,7 +107,7 @@ class TaxonomyController extends Controller
 
     public function info()
     {
-        $modelname = 'App\\' . $this->name;
+        $modelname = 'App\\Models\\App\\' . $this->name;
         $model = new $modelname;
 
         $data = [
@@ -166,7 +137,7 @@ class TaxonomyController extends Controller
     public function delete()
     {
         $id = (int)Input::get('id');
-        $modelname = 'App\\' . $this->name;
+        $modelname = 'App\\Models\\App\\' . $this->name;
         $model = new $modelname;
         $clone = $model->destroy($id);
         $this->clearQuerys();
@@ -190,6 +161,7 @@ class TaxonomyController extends Controller
         Cache::forget('builder_nav');
         $this->clearQuerys();
         Cache::forget('builder_relations');
+        Cache::forget('admin_' . $this->name . '_field_construct');
         return $this->index();
     }
 
@@ -211,7 +183,7 @@ class TaxonomyController extends Controller
      */
     public function create()
     {
-        $modelname = 'App\\' . $this->name;
+        $modelname = 'App\\Models\\App\\' . $this->name;
         $model = new $modelname;
         foreach ($model->fields as $key => $value) {
             $model->$key = Input::get($key);
@@ -297,13 +269,122 @@ class TaxonomyController extends Controller
     public
     function getModelNameSpace()
     {
-        return 'App\\' . $this->name;
+        return 'App\\Models\\App\\' . $this->name;
     }
 
     public
     function getControllerlNameSpace()
     {
         return 'App\Http\Controllers\\' . $this->name;
+    }
+
+    /**
+     * Rebuilds the table based on the scheame constructed vie
+     * the $class->field values,  DB actions are cached forever,
+     * locking changes unless a $this->cache function is ran.
+     * This is to protect DB's from being changed on accident
+     * ----------------------------------------------------------
+     * @param $class
+     * @param $tax
+     */
+    private function rebuildTables($class, $tax)
+    {
+        if (!Cache::has('admin_' . $tax . '_db_build')) {
+            if (!Schema::hasTable($tax)) {
+                Schema::create($tax, function (Blueprint $table) {
+                    $table->increments('id');
+                    $table->softDeletes();
+                    $table->rememberToken();
+                    $table->timestamps();
+                });
+            }
+
+            foreach ($class->fields as $key => $row) {
+                if (!Schema::hasColumn($tax, $key)) {
+                    Schema::table($tax, function ($table) use ($key, $row) {
+                        $type = $row['type'];
+                        $table->$type($key);
+                    });
+                }
+            }
+
+            $fieldsFlat = [];
+            foreach ($class->fields as $key => $value) {
+                $fieldsFlat[] = $key;
+            }
+
+            $columns = Schema::getColumnListing($tax);
+            foreach ($columns as $col) {
+                if (!in_array($col,
+                        $fieldsFlat) && $col != 'id' && $col != 'created_at' && $col != 'updated_at' && $col != 'deleted_at'
+                ) {
+                    if (Schema::hasColumn($tax, $col)) {
+                        Schema::table($tax, function ($table) use ($key, $row, $col) {
+                            $table->dropColumn($col);
+                        });
+                    }
+                }
+            }
+            Cache::forever('admin_' . $tax . '_db_build', 1);
+        }
+    }
+
+
+    /**
+     * Seeds the models field data with some prepopulated values
+     * Values are cached forever,  values are repopulated during the
+     * construnct() function of the model
+     * -------------------------------------------------------------
+     * @param $class
+     * @param $tax
+     */
+    private function rebuildClassFields($class, $tax)
+    {
+        /** Seed some Default values in the understanding that they may hvae been missed */
+        if (!Cache::has('admin_' . $tax . '_field_construct')) {
+            $newFields = [];
+            foreach ($class->fields as $row) {
+
+                /** Default $parent */
+                if (empty($row['parent'])) {
+                    $row['parent'] = 'general';
+                }
+
+                /** Default $label */
+                if (empty($row['label'])) {
+                    $row['label'] = 'Missing Label';
+                }
+
+                /** Default $placeholder */
+                if (empty($row['placeholder'])) {
+                    $row['placeholder'] = 'Missing Placeholder';
+                }
+
+                /** Default $type */
+                if (empty($row['type'])) {
+                    $row['type'] = 'string';
+                }
+
+                /** Default $rules */
+                if (empty($row['rules'])) {
+                    $row['rules'] = 'sometimes';
+                }
+
+                /** Default $hidden */
+                if (empty($row['hidden'])) {
+                    $row['hidden'] = 'false';
+                }
+
+                /** Default $table */
+                if (empty($row['table'])) {
+                    $row['table'] = 'false';
+                }
+
+
+                $newFields[] = $row;
+            }
+            Cache::forever('admin_' . $tax . '_field_construct', $newFields);
+        }
     }
 
     /**
@@ -320,7 +401,7 @@ class TaxonomyController extends Controller
         if (!Cache::has('builder_fields')) {
 
             /** Some prefunction varables to be filled */
-            $controllers = scandir(__DIR__ . '/../../');
+            $controllers = scandir(__DIR__ . '/../../../Models/App');
             $trueController = [];
             $fields = [];
             $relations = [];
@@ -329,8 +410,8 @@ class TaxonomyController extends Controller
             /** Step though each model in the folder */
             foreach ($controllers as $controller) {
                 if (strpos($controller, '.php') !== false) {
-                    $controllerNamespace = 'App\\' . str_replace('.php', '', $controller);
-                    if ($controllerNamespace != 'App\Users' && $controllerNamespace != 'App\Taxonomy') {
+                    $controllerNamespace = 'App\\Models\\App\\' . str_replace('.php', '', $controller);
+                    if ($controllerNamespace != 'App\\Models\\App\\Users' && $controllerNamespace != 'App\\Models\\App\\Taxonomy') {
                         $class = new $controllerNamespace();
 
                         /** Clean up our model files and turn them into usable names */
