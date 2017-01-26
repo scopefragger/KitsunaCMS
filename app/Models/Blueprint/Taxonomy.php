@@ -1,8 +1,9 @@
 <?php
 
-namespace App;
+namespace App\Models\Blueprint;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Taxonomy
@@ -74,6 +75,10 @@ class Taxonomy extends Model
     public function __construct()
     {
         $this->fields = array_merge($this->parentFields, $this->fields);
+        if (Cache::has('admin_' . $this->table . '_field_construct')) {
+            $values = Cache::get('admin_' . $this->table . '_field_construct');
+            $this->fields = $values;
+        }
     }
 
 
